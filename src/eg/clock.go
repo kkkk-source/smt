@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
-func ClockServer(port string) {
+func ClockServer(port string) error {
 	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	for {
@@ -23,6 +23,7 @@ func ClockServer(port string) {
 		}
 		go handleConn(conn)
 	}
+	return nil
 }
 
 func handleConn(c net.Conn) {
