@@ -15,7 +15,34 @@ import (
     "strings"
 )
 
-// localhost = 0.0.0.0
+// SpinnerAnimation computes the 45th Fibonacci number. Since it
+// uses the terribly inefficient recursive algorithm, it runs for
+// an appreciable time, during which it provide the user with a 
+// visual indication that the program is still running by displaying 
+// an animated textual "spinner".
+func SpinnerAnimation() {
+    go spinner(100*time.Millisecond)
+    fibN := fibonacci(45)
+    fmt.Printf("\rFibonacci(%d) = %d\n", n, fibN)
+}
+
+func spinner(delay time.Duration) {
+    for {
+        for _, r := range `-\|/` {
+            fmt.Printf("\r%c", r)
+            time.Sleep(delay)
+        }
+    }
+}
+
+func fibonacci(n int) int {
+    if n < 2 {
+        return n
+    }
+    return fib(n-1) + fib(n-2)
+}
+
+// localhost is equals to 0.0.0.0
 const ip = "0.0.0.0"
 
 // MakeServer make easy to create this package's
