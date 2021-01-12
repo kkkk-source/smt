@@ -1,9 +1,9 @@
-// eg package provide a variaty of concurrent programs that you can
+// example file provide a variaty of concurrent programs that you can
 // use to play with. becasue Networking is a natural domain in which
 // to use concurrency since servers typically handle many connections
 // from their clients at once, each client being essentially independent
 // of the others, there are some servers applications as well.
-package eg
+package main
 
 import (
 	"bufio"
