@@ -1,29 +1,22 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
+import "sync"
 
-var raceConditionDescription = `A race condition is a situation in which the program does not give the correct result for some interleavings of the operations of multiple threads. Race conditions are pernicious because they may remain latent in a program and appear infrequently, perhaps only under heavy load or when using certain compilers, platforms, orarchitectures. This makes them hard to reproduce and diagnose. 
+var RaceConditionDescription = `A race condition is a situation in which the program does not give the correct result for 
+some interleavings of the operations of multiple threads. Race conditions are pernicious because 
+they may remain latent in a program and appear infrequently, perhaps only under heavy load or when 
+using certain compilers, platforms, or architectures. This makes them hard to reproduce and diagnose.`
 
-It  is traditional to explain the seriousness of race conditions through the metaphor of financial loss, so we’ll consider a simple bank account program.`
+// FinancialLack always return the special outcome because of race condition
+// and the number of attemps that were taken to get that special outcome. It
+// takes two argument a, and b. Where a and b are the amounts that are going
+// to be deposited into the same bank account which always starts at 0.
+func DoFinancialLack(a, b int) (int, int) {
+	var want, attemps int
+	RestoreBalance()
 
-var balance int
-
-func Deposit(amount int) {
-	balance = balance + amount
-}
-
-func Balance() int {
-	return balance
-}
-
-func RaceConditionToPlayWith() {
-	const a = 200
-	const b = 100
-	const want = a + b
-
+	want = a + b
+	attemps = 0
 	for true {
 		var wg sync.WaitGroup
 
@@ -37,11 +30,25 @@ func RaceConditionToPlayWith() {
 			wg.Done()
 		}()
 		wg.Wait()
+		attemps++
 		if got := Balance(); got != want {
-			fmt.Printf("got = %d, want = %d\n", got, want)
-			balance = 0
-			return
+			return got, attemps
 		}
-		balance = 0
+		RestoreBalance()
 	}
+	return 0, 0
+}
+
+var balance int
+
+func RestoreBalance() {
+	balance = 0
+}
+
+func Deposit(amount int) {
+	balance = balance + amount
+}
+
+func Balance() int {
+	return balance
 }
