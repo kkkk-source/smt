@@ -1,119 +1,148 @@
 package main
 
-import "sync"
+import (
+    "fmt"
+    "sync"
+)
 
-var RaceConditionDescription = `A race condition is a situation in which the program does not give the correct result for 
-some interleavings of the operations of multiple threads. Race conditions are pernicious because 
-they may remain latent in a program and appear infrequently, perhaps only under heavy load or when 
-using certain compilers, platforms, or architectures. This makes them hard to reproduce and diagnose.`
+var NoSingleMachineWordRaceConditionSimulationInfo = `
 
-var NoSingleMachineWordStr = `Things get even messier if the data race involves a variable of a type that is larger than a single 
-machine word, such an interface, a string, or a slice: the pointer, the length, and the capacity.
-This code update concurretly two slices of different lengths:
+ RACE CONDITION ISSUE SIMULATION
+ _______________________________
 
-func NoSingleMachineWord() {
-    var x []int
-    go func() { x = make([]int, 10) }()
-    go func() { x = make([]int, 1000000) }()
-    x[999999] = 1 -> NOTE: undefined behavior; memory corruption possible!
-}
-
-The value of x in the final statement is not defined; it could be nil, or a slice of length 10, or 
-a slice of length 1,000,000. But recall that there are three parts to a slice: the pointer, the length, 
-and the capacity. If the pointer comes from the first call to make and the length comes from the second, 
-x would be a chimera, a slice whose nominal length is 1,000,000 but whose underlying array has only 10 
-elements.  In this eventuality, storing to element 999,999 would clobber an arbitrary faraway memory 
-location, with consequences that are imposible to predict and hard to debug and localize. This semantic
-minefield is called undefined behavior and is well known to C programmers.
++-{ Definition }--------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| A race condition is a situation in which the program does not give the correct result for some            |
+| interleavings of the operations of multiple threads. Race conditions are pernicious because they may      |
+| remain latent in a program and appear infrequently, perhaps only under heavy load or when using certain   |
+| compilers, platforms, or architectures. This makes them hard to reproduce and diagnose.                   |
+|                                                                                                           |
++-{ Context }-----------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| Things get even messier if the data race involves a variable of a type that is larger than a single       |
+| machine word, such an interface, a string, or a slice: the pointer, the length, and the capacity.         |
+|                                                                                                           |
+|                                                                                                           |
+| --A slice, is a dynamically-sized, flexible view into the elements of an array--                          |
+|                                                                                                           |
++-{ Function }----------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| This function updates concurretly two slices of different lengths. The value of x in the final statement  |
+| is not defined; it could be nil, or a slice of length 10, or a slice of length 1,000,000. But recall that |
+| there are three parts to a slice: the pointer, the length, and the capacity. If the pointer comes from    |
+| the first call to make and the length comes from the second, x would be a chimera, a slice whose nominal  |
+| length is 1,000,000 but whose underlying array has only 10 elements. In this eventuality, storing to      |
+| element 999,999 would clobber an arbitrary faraway memory location, with consequences that are imposible  |
+| to predict and hard to debug and localize. This semantic minefield is called undefined behavior and is    |
+| well known to C programmers.                                                                              |
+|                                                                                                           |
+| func NoSingleMachineWordRaceConditionSimulation() {                                                       |
+|   var x []int                                                                                             |
+|   go func() {                                                                                             |
+|     x = make([]int, 10)                                                                                   |
+|   }()                                                                                                     |
+|   go func() {                                                                                             |
+|     x = make([]int, 1000000)                                                                              |
+|   }()                                                                                                     |
+|   x[999999] = 1 -> NOTE: undefined behavior; memory corruption possible!                                  |
+| }                                                                                                         |
+|                                                                                                           |
++-----------------------------------------------------------------------------------------------------------+
 `
 
-var DoFinancialLackStr = `
-func DoFinancialLack(a, b int) (int, int) {
-	var want, attemps int
-	RestoreBalance()
+var FinancialLackRaceConditionSimulationInfo = `
 
-	want = a + b
-	attemps = 0
-	for true {
-		var wg sync.WaitGroup
+ RACE CONDITION ISSUE SIMULATION
+ _______________________________
 
-		wg.Add(2)
-		go func() {
-			Deposit(a)
-			wg.Done()
-		}()
-		go func() {
-			Deposit(b)
-			wg.Done()
-		}()
-		wg.Wait()
-		attemps++
-		if got := Balance(); got != want {
-			return got, attemps
-		}
-		RestoreBalance()
-	}
-	return 0, 0
-}
++-{ Definition }--------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| A race condition is a situation in which the program does not give the correct result for some            |
+| interleavings of the operations of multiple threads. Race conditions are pernicious because they may      |
+| remain latent in a program and appear infrequently, perhaps only under heavy load or when using certain   |
+| compilers, platforms, or architectures. This makes them hard to reproduce and diagnose.                   |
+|                                                                                                           |
++-{ Context }-----------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| It is traditional to explain the seriousness of race conditions through the metaphor of financial         |
+| loss, so we’ll consider a simple bank account program.                                                    |
+|                                                                                                           |
+| Let's suppose the following situation: Alice deposits %d, and Bob %d. There is a particular outcome,      
+| in which Bob's deposit occurs in the middle of Alice's deposit, after the balance has been read but       |
+| before it has been updated, causing Bob's transaction to disappear. This is because Alice's deposit       |
+| operation is really a sequence of two operations, a read and a write. What is that special outcome?       |
+|                                                                                                           |
++-{ Outcome }-----------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| The specia outcome is %d. The expected outcome is %d but we got %d so we say, the Bob's deposit (%d)      
+| was lost in heaven. Don't get lost in heaven. The number of attemps that were taken to get the            |
+| special outcome were %d.                                                                                  
+|                                                                                                           |
++-{ Function }----------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| This was the executed function which gave us the previous special outcome. The function name is           |
+| FinancialLackRaceConditionSimulation and always return the special outcome because of race condition. It  |
+| also returns the number of attemps that were taken to get that special outcome. It takes two argument a,  |
+| and b. Where a, and b are the amounts that are going to be deposited into the same bank account which     |
+| always starts at 0.                                                                                       |
+|                                                                                                           |
+| func FinancialLackRaceConditionSimulation(a, b int) (int, int) {                                          |
+|   var want, attemps int                                                                                   |
+|   RestoreBalance()                                                                                        |
+|                                                                                                           |
+|   want = a + b                                                                                            |
+|   attemps = 0                                                                                             |
+|   for true {                                                                                              |
+|     var wg sync.WaitGroup                                                                                 |
+|                                                                                                           |
+|     wg.Add(2)                                                                                             |
+|     go func() {                                                                                           |
+|       Deposit(a) <-- Race Condition here                                                                  |
+|       wg.Done()                                                                                           |
+|     }()                                                                                                   |
+|     go func() {                                                                                           |
+|       Deposit(b) <-- Race Condition here                                                                  |
+|       wg.Done()                                                                                           |
+|     }()                                                                                                   |
+|     wg.Wait()                                                                                             |
+|     attemps++                                                                                             |
+|     if got := Balance(); got != want {                                                                    |
+|       return got, attemps                                                                                 |
+|     }                                                                                                     |
+|     RestoreBalance()                                                                                      |
+|   }                                                                                                       |
+|   return 0, 0                                                                                             |
+| }                                                                                                         |
+|                                                                                                           |
++-{ Critical Section }--------------------------------------------------------------------------------------+
+|                                                                                                           |
+| This was the section responsible for the special outcome.                                                 |
+|                                                                                                           |
+| func Deposit(amount int) {                                                                                |
+|   balance = balance + amount  <-- Critical Section                                                        |
+| }                                                                                                         |
+|                                                                                                           |
++-----------------------------------------------------------------------------------------------------------+
 `
 
-var CriticalSectionStr = `
-func Deposit(amount int) {
-	balance = balance + amount
-}
-`
-
-// FinancialLack always return the special outcome because of race condition
-// and the number of attemps that were taken to get that special outcome. It
-// takes two argument a, and b. Where a and b are the amounts that are going
-// to be deposited into the same bank account which always starts at 0.
-func DoFinancialLack(a, b int) (int, int) {
-	var want, attemps int
-	RestoreBalance()
-
-	want = a + b
-	attemps = 0
-	for true {
-		var wg sync.WaitGroup
-
-		wg.Add(2)
-		go func() {
-			Deposit(a)
-			wg.Done()
-		}()
-		go func() {
-			Deposit(b)
-			wg.Done()
-		}()
-		wg.Wait()
-		attemps++
-		if got := Balance(); got != want {
-			return got, attemps
-		}
-		RestoreBalance()
-	}
-	return 0, 0
-}
+var (
+    balance int
+	deposits = make(chan int) // send amount to deposits
+	balances = make(chan int) // receive balance
+)
 
 func RestoreBalance() {
 	balance = 0
 }
 
-var balance int
-
-// Critical Section
 func Deposit(amount int) {
+    // critical section
 	balance = balance + amount
 }
 
 func Balance() int {
 	return balance
 }
-
-var (
-	deposits = make(chan int) // send amount to deposits
-	balances = make(chan int) // receive balance
-)
 
 func Deposits(amount int) {
 	deposits <- amount
@@ -123,7 +152,8 @@ func Balances() int {
 	return <-balances
 }
 
-func teller() {
+// Monitor goroutine
+func Teller() {
 	var balance int
 	for {
 		select {
@@ -134,13 +164,66 @@ func teller() {
 	}
 }
 
-var AvoidDataRaceSecondWayDescription = `The second way to avoid data race is to avoid accesing the variable from multiple threads and confined 
-it to a single thread.  Since other threads cannot access the variable directly, they must use a channel 
-to send the confinnig thread a request to query or update the variable. This is what is meant by the Go 
-mantra "Do not communicate by sharing memory; instad, share memory by communicating."`
+// FinancialLackRaceConditionSimulation always return the special outcome because 
+// of race condition and the number of attemps that were taken to get that special 
+// outcome. It takes two argument a, and b. Where a and b are the amounts that are 
+// going to be deposited into the same bank account which always starts at 0.
+func FinancialLackRaceConditionSimulation(a, b int) (int, int) {
+	var want, attemps int
+	RestoreBalance()
+
+	want = a + b
+	attemps = 0
+	for true {
+		var wg sync.WaitGroup
+
+		wg.Add(2)
+		go func() {
+			Deposit(a)
+			wg.Done()
+		}()
+		go func() {
+			Deposit(b)
+			wg.Done()
+		}()
+		wg.Wait()
+		attemps++
+		if got := Balance(); got != want {
+            // Printf(RaceConditionSimulationInfo, alice, bob, got, want, got, bob, attemps)
+            fmt.Printf(FinancialLackRaceConditionSimulationInfo, a, b, got, want, got, b, attemps)
+			return got, attemps
+		}
+		RestoreBalance()
+	}
+	return 0, 0
+}
+
+var AvoidRaceCondition = `
+
+ AVOIDING RACE CONDITION
+ _______________________
+
++-----------------------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| There are three ways to avoid data race.                                                                  |
+|                                                                                                           |
+| 1) The first way is not to write the variable. If instead we initialize with all necessary entries before |
+| creating threads and never modify it again, then any number of threads may safely call the related        |
+| function.                                                                                                 |
+|                                                                                                           |
+| 2) The second way to avoid data race is to avoid accesing the variable from multiple threads and confined |
+| it to a single thread. Since other threads cannot access the variable directly, they must use a channel   |
+| to send the confinnig thread a request to query or update the variable. This is what is meant by the Go   |
+| mantra "Do not communicate by sharing memory; instad, share memory by communicating."                     |
+|                                                                                                           |
+| 3) The third way to avoid a data race is to allow many threads to access the variable, but only one at a  |
+| time. This approach is known as mutual exclusion and is the subject of the next section.                  |
+|                                                                                                           |
++-----------------------------------------------------------------------------------------------------------+
+`
 
 func AvoidDataRaceSecondWay(a, b int) int {
-	go teller() // start the monitor
+	go Teller() // start the monitor
 	var wg sync.WaitGroup
 
 	wg.Add(2)
@@ -158,9 +241,6 @@ func AvoidDataRaceSecondWay(a, b int) int {
 	RestoreBalance()
 	return got
 }
-
-var AvoidDataRaceThirdWayDescription = ` The third way to avoid a data race is to allow many threads to access the variable, but only 
-one at a time. This approach is known as mutual exclusion and is the subject of the next section.`
 
 func AvoidDataRaceThirdWay(a, b int) int {
 	var wg sync.WaitGroup
