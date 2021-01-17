@@ -1,42 +1,6 @@
 package smt
 
-import (
-    "fmt"
-    "sync"
-    "os"
-)
-
-type Simulater interface {
-    Execute()
-}
-
-func Simulate(s Simulater) {
-    s.Execute()
-}
-
-type FinancialSimulater struct {
-    Alice, Bob int
-}
-
-func (f FinancialSimulater) Execute() {
-    if f.Alice == 0 {
-        f.Alice = 200
-    }
-    if f.Bob == 0 {
-        f.Bob = 500
-    }
-
-    want := f.Alice + f.Bob
-    got, attemps := FinancialLackRaceConditionSimulation(f.Alice, f.Bob)
-    fmt.Fprintf(os.Stderr, FinancialLackRaceConditionSimulationInfo, f.Alice, f.Bob, got, want, got, f.Bob, attemps)
-}
-
-type NoSingleMachineWordSimulater struct {
-}
-
-func (n NoSingleMachineWordSimulater) Execute() {
-    fmt.Fprintf(os.Stderr, NoSingleMachineWordRaceConditionSimulationInfo)
-}
+import "sync"
 
 const FinancialLackRaceConditionSimulationInfo = `
  RACE CONDITION ISSUE SIMULATION
