@@ -3,7 +3,7 @@
 // to use concurrency since servers typically handle many connections
 // from their clients at once, each client being essentially independent
 // of the others, there are some servers applications as well.
-package main
+package smt
 
 import (
 	"bufio"
@@ -95,16 +95,11 @@ func fibonacci(n int) int {
 	return fibonacci(n-1) + fibonacci(n-2)
 }
 
-// localhost is equals to 0.0.0.0
-const ip = "0.0.0.0"
-
-// MakeServer make easy to create this package's
-// servers, e.g, ClockServer or EchoServer.
-func MakeServer(fn func(net.Conn), port string) error {
-	if port == "" {
-		port = "8000"
-	}
-	listener, err := net.Listen("tcp", ip+":"+port)
+// MakeServer make easy to create this package's servers, e.g, ClockServer 
+// or EchoServer. If cway is true the server will be executed in a concurrent 
+// fashion, otherwise the server will be executed in a sequential fashion.
+func MakeServer(fn func(net.Conn), port string, cway bool) error {
+	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		return err
 	}
@@ -115,7 +110,11 @@ func MakeServer(fn func(net.Conn), port string) error {
 			log.Print(err)
 			continue
 		}
-		go fn(conn)
+        if cway {
+            go fn(conn)
+        } else {
+            fn(conn)
+        }
 	}
 	return nil
 }
