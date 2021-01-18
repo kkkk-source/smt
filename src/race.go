@@ -280,7 +280,7 @@ const avoidRaceConditionSimulation = `
 |
 | Executing the following function, which referes to the second way of avoiding race condition from [ Avoid 
 | Race Condition ] section, you would get %d, when Alice deposits %d and Bob %d. So this approach works 
-| good.                                                                                                     |
+| correctly.                                                                                                |
 |                                                                                                           |
 | func avoidDataRaceSecondWay(a, b int) int {                                                               |
 |   go Teller()                                                                                             |
@@ -323,7 +323,7 @@ const avoidRaceConditionSimulation = `
 |                                                                                                           |
 | Executing the following function, which referes to the third way of avoiding race condition from [ Avoid  | 
 | Race Condition ] section, you would get %d, when Alice deposits %d and Bob %d. So this approach works     |
-| good.                                                                                                     |
+| correctly as well.                                                                                        |
 |                                                                                                           |
 | func avoidDataRaceThirdWay(a, b int) int {                                                                |
 |   var wg sync.WaitGroup                                                                                   |
