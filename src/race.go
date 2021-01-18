@@ -353,14 +353,14 @@ const avoidRaceConditionSimulation = `
 `
 
 func SimulateFinancialLackSimulation() {
-    const a, b = 200, 500
-    const want = a + b
-    got, attemps := financialLackRaceConditionSimulation(a, b)
-    fmt.Printf(financialLackRaceConditionSimulationInfo,)
+	const a, b = 200, 500
+	const want = a + b
+	got, attemps := financialLackRaceConditionSimulation(a, b)
+	fmt.Printf(financialLackRaceConditionSimulationInfo)
 }
 
 var (
-    balance int
+	balance  int
 	deposits = make(chan int) // send amount to deposits
 	balances = make(chan int) // receive balance
 )
@@ -370,7 +370,7 @@ func restoreBalance() {
 }
 
 func setDeposit(amount int) {
-    // critical section
+	// critical section
 	balance = balance + amount
 }
 
@@ -398,9 +398,9 @@ func teller() {
 	}
 }
 
-// FinancialLackRaceConditionSimulation always return the special outcome because 
-// of race condition and the number of attemps that were taken to get that special 
-// outcome. It takes two argument a, and b. Where a and b are the amounts that are 
+// FinancialLackRaceConditionSimulation always return the special outcome because
+// of race condition and the number of attemps that were taken to get that special
+// outcome. It takes two argument a, and b. Where a and b are the amounts that are
 // going to be deposited into the same bank account which always starts at 0.
 func financialLackRaceConditionSimulation(a, b int) (int, int) {
 	var want, attemps int

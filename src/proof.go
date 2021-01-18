@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-func MakeProof(fn func (io.Writer, io.Reader), port string) {
-    conn, err := net.Dial("tcp", "0.0.0.0:"+port)
+func MakeProof(fn func(io.Writer, io.Reader), port string) {
+	conn, err := net.Dial("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		log.Fatal(err)
 	}

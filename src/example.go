@@ -95,8 +95,8 @@ func fibonacci(n int) int {
 	return fibonacci(n-1) + fibonacci(n-2)
 }
 
-// MakeServer make easy to create this package's servers, e.g, ClockServer 
-// or EchoServer. If cway is true the server will be executed in a concurrent 
+// MakeServer make easy to create this package's servers, e.g, ClockServer
+// or EchoServer. If cway is true the server will be executed in a concurrent
 // fashion, otherwise the server will be executed in a sequential fashion.
 func MakeServer(fn func(net.Conn), port string, cway bool) error {
 	listener, err := net.Listen("tcp", "0.0.0.0:"+port)
@@ -110,11 +110,11 @@ func MakeServer(fn func(net.Conn), port string, cway bool) error {
 			log.Print(err)
 			continue
 		}
-        if cway {
-            go fn(conn)
-        } else {
-            fn(conn)
-        }
+		if cway {
+			go fn(conn)
+		} else {
+			fn(conn)
+		}
 	}
 	return nil
 }
@@ -136,7 +136,7 @@ func ClockServer(c net.Conn) {
 // the response loud at first ("WTF!"), then moderate ("Wtf!")
 // after a delay, then quiet ("wft!") before fading to nothing.
 func EchoServer(c net.Conn) {
-    defer c.Close()
+	defer c.Close()
 	input := bufio.NewScanner(c)
 	for input.Scan() {
 		echo(c, input.Text(), 1*time.Second)
