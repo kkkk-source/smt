@@ -136,6 +136,7 @@ func ClockServer(c net.Conn) {
 // the response loud at first ("WTF!"), then moderate ("Wtf!")
 // after a delay, then quiet ("wft!") before fading to nothing.
 func EchoServer(c net.Conn) {
+    defer c.Close()
 	input := bufio.NewScanner(c)
 	for input.Scan() {
 		echo(c, input.Text(), 1*time.Second)
