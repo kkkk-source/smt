@@ -2,7 +2,7 @@ package smt
 
 import "sync"
 
-const FinancialLackRaceConditionSimulationInfo = `
+const financialLackRaceConditionSimulationInfo = `
  RACE CONDITION ISSUE SIMULATION
  _______________________________
 
@@ -37,9 +37,9 @@ const FinancialLackRaceConditionSimulationInfo = `
 | and b. Where a, and b are the amounts that are going to be deposited into the same bank account which     |
 | always starts at 0.                                                                                       |
 |                                                                                                           |
-| func FinancialLackRaceConditionSimulation(a, b int) (int, int) {                                          |
+| func financialLackRaceConditionSimulation(a, b int) (int, int) {                                          |
 |   var want, attemps int                                                                                   |
-|   RestoreBalance()                                                                                        |
+|   restoreBalance()                                                                                        |
 |                                                                                                           |
 |   want = a + b                                                                                            |
 |   attemps = 0                                                                                             |
@@ -48,19 +48,19 @@ const FinancialLackRaceConditionSimulationInfo = `
 |                                                                                                           |
 |     wg.Add(2)                                                                                             |
 |     go func() {                                                                                           |
-|       Deposit(a) <-- Race Condition here                                                                  |
+|       setDeposit(a) <-- Race Condition here                                                               |
 |       wg.Done()                                                                                           |
 |     }()                                                                                                   |
 |     go func() {                                                                                           |
-|       Deposit(b) <-- Race Condition here                                                                  |
+|       setDeposit(b) <-- Race Condition here                                                               |
 |       wg.Done()                                                                                           |
 |     }()                                                                                                   |
 |     wg.Wait()                                                                                             |
 |     attemps++                                                                                             |
-|     if got := Balance(); got != want {                                                                    |
+|     if got := getBalance(); got != want {                                                                 |
 |       return got, attemps                                                                                 |
 |     }                                                                                                     |
-|     RestoreBalance()                                                                                      |
+|     restoreBalance()                                                                                      |
 |   }                                                                                                       |
 |   return 0, 0                                                                                             |
 | }                                                                                                         |
@@ -69,14 +69,14 @@ const FinancialLackRaceConditionSimulationInfo = `
 |                                                                                                           |
 | This was the section responsible for the special outcome.                                                 |
 |                                                                                                           |
-| func Deposit(amount int) {                                                                                |
+| func setDeposit(amount int) {                                                                             |
 |   balance = balance + amount  <-- Critical Section                                                        |
 | }                                                                                                         |
 |                                                                                                           |
 +-----------------------------------------------------------------------------------------------------------+
 `
 
-const NoSingleMachineWordRaceConditionSimulationInfo = `
+const noSingleMachineWordRaceConditionSimulationInfo = `
  RACE CONDITION ISSUE SIMULATION
  _______________________________
 
@@ -106,7 +106,7 @@ const NoSingleMachineWordRaceConditionSimulationInfo = `
 | to predict and hard to debug and localize. This semantic minefield is called undefined behavior and is    |
 | well known to C programmers.                                                                              |
 |                                                                                                           |
-| func NoSingleMachineWordRaceConditionSimulation() {                                                       |
+| func noSingleMachineWordRaceConditionSimulation() {                                                       |
 |   var x []int                                                                                             |
 |   go func() {                                                                                             |
 |     x = make([]int, 10)                                                                                   |
@@ -120,9 +120,9 @@ const NoSingleMachineWordRaceConditionSimulationInfo = `
 +-----------------------------------------------------------------------------------------------------------+
 `
 
-const AvoidRaceCondition = `
+const avoidRaceCondition = `
                                           --Before going through this section make sure you have executed 
-                                                        the FinancialLackRaceConditionSimulation already.--
+                                                    the Financial Lack Race Condition Simulation already.--
 
  AVOIDING RACE CONDITION
  _______________________
@@ -132,9 +132,9 @@ const AvoidRaceCondition = `
 | Did you remember the FinancialLackRaceConditionSimulation? Well let's us put it and the critical section  |
 | just here (here we go again):                                                                             |
 |                                                                                                           |
-| func FinancialLackRaceConditionSimulation(a, b int) (int, int) {                                          |
+| func financialLackRaceConditionSimulation(a, b int) (int, int) {                                          |
 |   var want, attemps int                                                                                   |
-|   RestoreBalance()                                                                                        |
+|   restoreBalance()                                                                                        |
 |                                                                                                           |
 |   want = a + b                                                                                            |
 |   attemps = 0                                                                                             |
@@ -143,24 +143,24 @@ const AvoidRaceCondition = `
 |                                                                                                           |
 |     wg.Add(2)                                                                                             |
 |     go func() {                                                                                           |
-|       Deposit(a) <-- Race Condition here                                                                  |
+|       setDeposit(a) <-- Race Condition here                                                               |
 |       wg.Done()                                                                                           |
 |     }()                                                                                                   |
 |     go func() {                                                                                           |
-|       Deposit(b) <-- Race Condition here                                                                  |
+|       setDeposit(b) <-- Race Condition here                                                               |
 |       wg.Done()                                                                                           |
 |     }()                                                                                                   |
 |     wg.Wait()                                                                                             |
 |     attemps++                                                                                             |
-|     if got := Balance(); got != want {                                                                    |
+|     if got := getBalance(); got != want {                                                                 |
 |       return got, attemps                                                                                 |
 |     }                                                                                                     |
-|     RestoreBalance()                                                                                      |
+|     restoreBalance()                                                                                      |
 |   }                                                                                                       |
 |   return 0, 0                                                                                             |
 | }                                                                                                         |
 |                                                                                                           |
-| func Deposit(amount int) {                                                                                |
+| func setDeposit(amount int) {                                                                             |
 |   balance = balance + amount  <-- Critical Section                                                        |
 | }                                                                                                         |
 |                                                                                                           |
@@ -179,31 +179,134 @@ const AvoidRaceCondition = `
 |                                                                                                           |
 | Now let's fix our previous FinancialLackRaceConditionSimulation code with this approach.                  |
 |                                                                                                           |
-| func AvoidDataRaceSecondWay(a, b int) int {                                                               |
+| func avoidDataRaceSecondWay(a, b int) int {                                                               |
 |   go Teller()                                                                                             |
 |   var wg sync.WaitGroup                                                                                   |
 |                                                                                                           |
 |   wg.Add(2)                                                                                               |
 |   go func() {                                                                                             |
-|     Deposits(a)                                                                                           |
+|     setDeposits(a)                                                                                        |
 |     wg.Done()                                                                                             |
 |   }()                                                                                                     |
 |   go func() {                                                                                             |
-|     Deposits(b)                                                                                           |
+|     setDeposits(b)                                                                                        |
 |     wg.Done()                                                                                             |
 |   }()                                                                                                     |
 |                                                                                                           |
 |   wg.Wait()                                                                                               |
-|   got := Balances()                                                                                       |
-|   RestoreBalance()                                                                                        |
+|   got := getBalances()                                                                                    |
+|   restoreBalance()                                                                                        |
 |   return got                                                                                              |
 | }                                                                                                         |
 |                                                                                                           |
-| func Deposits(amount int) {                                                                               |
+| func setDeposits(amount int) {                                                                            |
 |   deposits <- amount                                                                                      |
 | }                                                                                                         |
 |                                                                                                           |
-| func Balances() int {                                                                                     |
+| func getBalances() int {                                                                                  |
+|   return <-balances                                                                                       |
+| }                                                                                                         |
+|                                                                                                           |
+| func teller() {                                                                                           |
+|   var balance int                                                                                         |
+|   for {                                                                                                   |
+|     select {                                                                                              |
+|     case amount := <-deposits:                                                                            |
+|       balance += amount                                                                                   |
+|     case balances <- balance:                                                                             |
+|     }                                                                                                     |
+|   }                                                                                                       |
+| }                                                                                                         |
+|                                                                                                           |
+| 3) The third way to avoid a data race is to allow many threads to access the variable, but only one at a  |
+| time. This approach is known as mutual exclusion and is the subject of the next section.                  |
+|                                                                                                           |
+| func avoidDataRaceThirdWay(a, b int) int {                                                                |
+|   var wg sync.WaitGroup                                                                                   |
+|   var mu sync.Mutex                                                                                       |
+|                                                                                                           |
+|   restoreBalance()                                                                                        |
+|   wg.Add(2)                                                                                               |
+|   go func() {                                                                                             |
+|     mu.Lock()     <-- lock                                                                                |
+|     setDeposit(a)  <-- critical section                                                                 |
+|     mu.Unlock()   <-- unlock                                                                              |
+|     wg.Done()                                                                                             |
+|   }()                                                                                                     |
+|   go func() {                                                                                             |
+|     mu.Lock()     <-- lock                                                                                |
+|     setDeposit(b)    <-- critical section                                                                 |
+|     mu.Unlock()   <-- unlock                                                                              |
+|     wg.Done()                                                                                             |
+|   }()                                                                                                     |
+|   wg.Wait()                                                                                               |
+|   got := getBalance()                                                                                     |
+|   restoreBalance()                                                                                        |
+|   return got                                                                                              |
+| }                                                                                                         |
+|                                                                                                           |
++-{ Learn more }--------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| If you want to have these solutions on proof, run %s --help and see wath you can do.                      |
+|                                                                                                           |
++-----------------------------------------------------------------------------------------------------------+
+`
+
+const avoidRaceConditionSimulation = `
+                                          --Before going through this section make sure you have executed 
+                                                    the Financial Lack Race Condition Simulation already.--
+ AVOID RACE CONDITION SIMULATION
+ _______________________________
+
++-{ Definition }--------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| Recall that a race condition is a situation in which the program does not give the correct result for     |
+| some interleavings of the operations of multiple threads. Race conditions are pernicious because they may |
+| remain latent in a program and appear infrequently, perhaps only under heavy load or when using certain   |
+| compilers, platforms, or architectures. This makes them hard to reproduce and diagnose.                   |
+|                                                                                                           |
++-{ Context }-----------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| In the previous Financial Lack Race Condition Simulation we have an issue. If Alice deposits %d, and 
+| Bob %d. when Alice or Bob wants to read their bank account, they could get an outcome like this %d 
+| instead of %d, which is the correct outcome.
+|                                                                                                           |
++-{ Outcomes }----------------------------------------------------------------------------------------------+
+|                                                                                                           |
+| Let's run the simulation again but this time we are going to use the adquired knowledge of Avoid Race     |
+| Condition section.                                                                                        |
+|                                                                                                           |
++-----------------------------------------------------------------------------------------------------------+
+|
+| Executing the following function, which referes to the second way of avoiding race condition from [ Avoid 
+| Race Condition ] section, you would get %d, when Alice deposits %d and Bob %d. So this approach works 
+| good.                                                                                                     |
+|                                                                                                           |
+| func avoidDataRaceSecondWay(a, b int) int {                                                               |
+|   go Teller()                                                                                             |
+|   var wg sync.WaitGroup                                                                                   |
+|                                                                                                           |
+|   wg.Add(2)                                                                                               |
+|   go func() {                                                                                             |
+|     setDeposits(a)                                                                                        |
+|     wg.Done()                                                                                             |
+|   }()                                                                                                     |
+|   go func() {                                                                                             |
+|     setDeposits(b)                                                                                        |
+|     wg.Done()                                                                                             |
+|   }()                                                                                                     |
+|                                                                                                           |
+|   wg.Wait()                                                                                               |
+|   got := getBalances()                                                                                    |
+|   restoreBalance()                                                                                        |
+|   return got                                                                                              |
+| }                                                                                                         |
+|                                                                                                           |
+| func setDeposits(amount int) {                                                                            |
+|   deposits <- amount                                                                                      |
+| }                                                                                                         |
+|                                                                                                           |
+| func getBalances() int {                                                                                  |
 |   return <-balances                                                                                       |
 | }                                                                                                         |
 |                                                                                                           |
@@ -218,39 +321,43 @@ const AvoidRaceCondition = `
 |   }                                                                                                       |
 | }                                                                                                         |
 |                                                                                                           |
-| 3) The third way to avoid a data race is to allow many threads to access the variable, but only one at a  |
-| time. This approach is known as mutual exclusion and is the subject of the next section.                  |
+| Executing the following function, which referes to the third way of avoiding race condition from [ Avoid  | 
+| Race Condition ] section, you would get %d, when Alice deposits %d and Bob %d. So this approach works     |
+| good.                                                                                                     |
 |                                                                                                           |
-| func AvoidDataRaceThirdWay(a, b int) int {                                                                |
+| func avoidDataRaceThirdWay(a, b int) int {                                                                |
 |   var wg sync.WaitGroup                                                                                   |
 |   var mu sync.Mutex                                                                                       |
 |                                                                                                           |
-|   RestoreBalance()                                                                                        |
+|   restoreBalance()                                                                                        |
 |   wg.Add(2)                                                                                               |
 |   go func() {                                                                                             |
-|     mu.Lock()     <-- lock                                                                                |
-|     Deposit(a)    <-- critical section                                                                    |
-|     mu.Unlock()   <-- unlock                                                                              |
+|     mu.Lock()                                                                                             |
+|     setDeposit(a)                                                                                         |
+|     mu.Unlock()                                                                                           |
 |     wg.Done()                                                                                             |
 |   }()                                                                                                     |
 |   go func() {                                                                                             |
-|     mu.Lock()     <-- lock                                                                                |
-|     Deposit(b)    <-- critical section                                                                    |
-|     mu.Unlock()   <-- unlock                                                                              |
+|     mu.Lock()                                                                                             |
+|     setDeposit(b)                                                                                         |
+|     mu.Unlock()                                                                                           |
 |     wg.Done()                                                                                             |
 |   }()                                                                                                     |
 |   wg.Wait()                                                                                               |
-|   got := Balance()                                                                                        |
-|   RestoreBalance()                                                                                        |
+|   got := getBalance()                                                                                     |
+|   restoreBalance()                                                                                        |
 |   return got                                                                                              |
 | }                                                                                                         |
 |                                                                                                           |
-+-{ Learn more }--------------------------------------------------------------------------------------------+
-|                                                                                                           |
-| If you want to have these solutions on proof, run %s --help and see wath you can do.                      |
-|                                                                                                           |
 +-----------------------------------------------------------------------------------------------------------+
 `
+
+func SimulateFinancialLackSimulation() {
+    const a, b = 200, 500
+    const want = a + b
+    got, attemps := financialLackRaceConditionSimulation(a, b)
+    fmt.Printf(financialLackRaceConditionSimulationInfo,)
+}
 
 var (
     balance int
@@ -258,29 +365,29 @@ var (
 	balances = make(chan int) // receive balance
 )
 
-func RestoreBalance() {
+func restoreBalance() {
 	balance = 0
 }
 
-func Deposit(amount int) {
+func setDeposit(amount int) {
     // critical section
 	balance = balance + amount
 }
 
-func Balance() int {
+func getBalance() int {
 	return balance
 }
 
-func Deposits(amount int) {
+func setDeposits(amount int) {
 	deposits <- amount
 }
 
-func Balances() int {
+func getBalances() int {
 	return <-balances
 }
 
 // Monitor goroutine
-func Teller() {
+func teller() {
 	var balance int
 	for {
 		select {
@@ -295,9 +402,9 @@ func Teller() {
 // of race condition and the number of attemps that were taken to get that special 
 // outcome. It takes two argument a, and b. Where a and b are the amounts that are 
 // going to be deposited into the same bank account which always starts at 0.
-func FinancialLackRaceConditionSimulation(a, b int) (int, int) {
+func financialLackRaceConditionSimulation(a, b int) (int, int) {
 	var want, attemps int
-	RestoreBalance()
+	restoreBalance()
 
 	want = a + b
 	attemps = 0
@@ -306,63 +413,63 @@ func FinancialLackRaceConditionSimulation(a, b int) (int, int) {
 
 		wg.Add(2)
 		go func() {
-			Deposit(a)
+			setDeposit(a)
 			wg.Done()
 		}()
 		go func() {
-			Deposit(b)
+			setDeposit(b)
 			wg.Done()
 		}()
 		wg.Wait()
 		attemps++
-		if got := Balance(); got != want {
+		if got := getBalance(); got != want {
 			return got, attemps
 		}
-		RestoreBalance()
+		restoreBalance()
 	}
 	return 0, 0
 }
 
-func AvoidDataRaceSecondWay(a, b int) int {
-	go Teller() // start the monitor
+func avoidDataRaceSecondWay(a, b int) int {
+	go teller() // start the monitor
 	var wg sync.WaitGroup
 
 	wg.Add(2)
 	go func() {
-		Deposits(a)
+		setDeposits(a)
 		wg.Done()
 	}()
 	go func() {
-		Deposits(b)
+		setDeposits(b)
 		wg.Done()
 	}()
 
 	wg.Wait()
-	got := Balances()
-	RestoreBalance()
+	got := getBalances()
+	restoreBalance()
 	return got
 }
 
-func AvoidDataRaceThirdWay(a, b int) int {
+func avoidDataRaceThirdWay(a, b int) int {
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 
-	RestoreBalance()
+	restoreBalance()
 	wg.Add(2)
 	go func() {
 		mu.Lock()
-		Deposit(a)
+		setDeposit(a)
 		mu.Unlock()
 		wg.Done()
 	}()
 	go func() {
 		mu.Lock()
-		Deposit(b)
+		setDeposit(b)
 		mu.Unlock()
 		wg.Done()
 	}()
 	wg.Wait()
-	got := Balance()
-	RestoreBalance()
+	got := getBalance()
+	restoreBalance()
 	return got
 }
