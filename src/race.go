@@ -1,6 +1,10 @@
 package smt
 
-import "sync"
+import (
+	"fmt"
+	"os"
+	"sync"
+)
 
 const financialLackRaceConditionSimulationInfo = `
  RACE CONDITION ISSUE SIMULATION
@@ -245,10 +249,6 @@ const avoidRaceCondition = `
 |   return got                                                                                              |
 | }                                                                                                         |
 |                                                                                                           |
-+-{ Learn more }--------------------------------------------------------------------------------------------+
-|                                                                                                           |
-| If you want to have these solutions on proof, run %s --help and see wath you can do.                      |
-|                                                                                                           |
 +-----------------------------------------------------------------------------------------------------------+
 `
 
@@ -352,12 +352,31 @@ const avoidRaceConditionSimulation = `
 +-----------------------------------------------------------------------------------------------------------+
 `
 
-func SimulateFinancialLackSimulation() {
-	const a, b = 200, 500
-	const want = a + b
-	got, attemps := financialLackRaceConditionSimulation(a, b)
-	fmt.Printf(financialLackRaceConditionSimulationInfo)
+// API
+func FinancialLackSimulation(alice, bob int) {
+	want := alice + bob
+	got, attemps := financialLackRaceConditionSimulation(alice, bob)
+	fmt.Fprintf(os.Stderr, financialLackRaceConditionSimulationInfo, alice, bob, got, want, got, bob, attemps)
 }
+
+func FinancialLackSimulationWithoutInfo(alice, bob int) {
+	got, attemps := financialLackRaceConditionSimulation(alice, bob)
+	fmt.Fprintf(os.Stderr, "alice = %d, bob = %d, got = %d, attemps = %d\n", alice, bob, got, attemps)
+}
+
+func NoSingleMachineWordSimulation() {
+	fmt.Fprintf(os.Stderr, noSingleMachineWordRaceConditionSimulationInfo)
+}
+
+func AvoidDataRace(alice, bob int) {
+	fmt.Fprintf(os.Stderr, avoidRaceConditionSimulation)
+	gotA := avoidDataRaceSecondWay(alice, bob)
+	gotB := avoidDataRaceThirdWay(alice, bob)
+	gotC, _ := financialLackRaceConditionSimulation(alice, bob)
+	fmt.Fprintf(os.Stderr, avoidRaceConditionSimulation, alice, bob, gotC, gotA, alice, bob, gotB, alice, bob)
+}
+
+//
 
 var (
 	balance  int
