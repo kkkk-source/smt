@@ -8,27 +8,27 @@ import (
 )
 
 // MakeProof make easy to create a ClockServerProof and a EchoServerProof.
-func MakeProof(fn func(io.ReadWriter, io.ReadWriter), port string) {
+func MakeProof(fn func(io.ReadWriter), port string) {
 	conn, err := net.Dial("tcp", "0.0.0.0:"+port)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer conn.Close()
-	fn(os.Stdout, conn)
+	fn(conn)
 }
 
-// ClockServerProof is a TCP read-only client. You can 
+// ClockServerProof is a TCP read-only client. You can
 // use it to read from the ClockServer output.
-func ClockServerProof(dst io.ReadWriter, src io.ReadWriter) {
-	mustCopy(dst, src)
+func ClockServerProof(src io.ReadWriter) {
+	mustCopy(os.Stdout, src)
 }
 
-// EchoServerProof is TCP read-write client. You can 
+// EchoServerProof is TCP read-write client. You can
 // use it to read from and write to the EchoServer.
-func EchoServerProof(dst io.ReadWriter, src io.ReadWriter) {
-	go mustCopy(dst, src)
-	mustCopy(src, dst)
+func EchoServerProof(src io.ReadWriter) {
+	go mustCopy(os.Stdout, src)
+	mustCopy(src, os.Stdin)
 }
 
 func mustCopy(dst io.Writer, src io.Reader) {
