@@ -352,7 +352,6 @@ const avoidRaceConditionSimulation = `
 +-----------------------------------------------------------------------------------------------------------+
 `
 
-// API
 func FinancialLackSimulation(alice, bob int) {
 	want := alice + bob
 	got, attemps := financialLackRaceConditionSimulation(alice, bob)
@@ -375,8 +374,6 @@ func AvoidDataRace(alice, bob int) {
 	gotC, _ := financialLackRaceConditionSimulation(alice, bob)
 	fmt.Fprintf(os.Stderr, avoidRaceConditionSimulation, alice, bob, gotC, gotA, alice, bob, gotB, alice, bob)
 }
-
-//
 
 var (
 	balance  int
