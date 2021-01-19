@@ -4,9 +4,9 @@ import "flag"
 
 var (
 	SFlag sFlag
+	FFlag sFlag
 	EFlag = flag.Int("e", 0, eUsage)
 	TFlag = flag.Int("t", 0, tUsage)
-	FFlag = flag.Int("f", 0, fUsage)
 	CFlag = flag.Int("c", 0, cUsage)
 	WFlag = flag.Int("w", 0, wUsage)
 )
@@ -42,8 +42,7 @@ Execute SIMULATION_ID:
 	fUsage = `
 Execute one simulations of corrects concurrent functions:
 
-    1 Avoid Race Condition Second Way 
-    2 Avoid Race Condition Third  Way
+    1 Avoid Race Condition Second and Third Way 
 `
 	wUsage = `
  It Follows the -s or -f flags and avoid displaying the simulation information.
@@ -64,4 +63,5 @@ func (s *sFlag) Set(value string) error {
 
 func init() {
 	flag.Var(&SFlag, "s", sUsage)
+	flag.Var(&FFlag, "f", fUsage)
 }
