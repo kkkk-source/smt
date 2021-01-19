@@ -30,8 +30,8 @@ or concurrent fashion the Echo Server and Clock Server demostrations.
 	tUsage = `
 Execute TCP_CLIENT_ID:
 
-    2 Read-write TCP client
-    1 Read-only TCP client
+    1 Read-write TCP client
+    2 Read-only TCP client
 `
 	sUsage = `
 Execute SIMULATION_ID:
