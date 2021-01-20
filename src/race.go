@@ -233,7 +233,7 @@ const avoidRaceCondition = `
 |   wg.Add(2)                                                                                               |
 |   go func() {                                                                                             |
 |     mu.Lock()     <-- lock                                                                                |
-|     setDeposit(a)  <-- critical section                                                                 |
+|     setDeposit(a)  <-- critical section                                                                   |
 |     mu.Unlock()   <-- unlock                                                                              |
 |     wg.Done()                                                                                             |
 |   }()                                                                                                     |
@@ -322,7 +322,7 @@ const avoidRaceConditionSimulation = `
 | }                                                                                                         |
 |                                                                                                           |
 | Executing the following function, which referes to the third way of avoiding race condition from [ Avoid  | 
-| Race Condition ] section, you would get %d, when Alice deposits %d and Bob %d. So this approach works     |
+| Race Condition ] section, you would get %d, when Alice deposits %d and Bob %d. So this approach works     
 | correctly as well.                                                                                        |
 |                                                                                                           |
 | func avoidDataRaceThirdWay(a, b int) int {                                                                |
@@ -358,21 +358,17 @@ func FinancialLackSimulation(alice, bob int) {
 	fmt.Fprintf(os.Stderr, financialLackRaceConditionSimulationInfo, alice, bob, got, want, got, bob, attemps)
 }
 
-func FinancialLackSimulationWithoutInfo(alice, bob int) {
-	got, attemps := financialLackRaceConditionSimulation(alice, bob)
-	fmt.Fprintf(os.Stderr, "alice = %d, bob = %d, got = %d, attemps = %d\n", alice, bob, got, attemps)
-}
-
 func NoSingleMachineWordSimulation() {
 	fmt.Fprintf(os.Stderr, noSingleMachineWordRaceConditionSimulationInfo)
 }
 
 func AvoidDataRace(alice, bob int) {
-	fmt.Fprintf(os.Stderr, avoidRaceConditionSimulation)
+	fmt.Fprintf(os.Stderr, avoidRaceCondition)
+	want := alice + bob
 	gotA := avoidDataRaceSecondWay(alice, bob)
 	gotB := avoidDataRaceThirdWay(alice, bob)
 	gotC, _ := financialLackRaceConditionSimulation(alice, bob)
-	fmt.Fprintf(os.Stderr, avoidRaceConditionSimulation, alice, bob, gotC, gotA, alice, bob, gotB, alice, bob)
+	fmt.Fprintf(os.Stderr, avoidRaceConditionSimulation, alice, bob, gotC, want, gotA, alice, bob, gotB, alice, bob)
 }
 
 var (
