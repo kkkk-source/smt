@@ -8,7 +8,6 @@ var (
 	EFlag = flag.Int("e", 0, eUsage)
 	TFlag = flag.Int("t", 0, tUsage)
 	CFlag = flag.Int("c", 0, cUsage)
-	WFlag = flag.Int("w", 0, wUsage)
 )
 
 const (
@@ -43,10 +42,6 @@ Execute SIMULATION_ID:
 Execute one simulations of corrects concurrent functions:
 
     1 Avoid Race Condition Second and Third Way 
-`
-	wUsage = `
- It Follows the -s or -f flags and avoid displaying the simulation information.
- Use it when you want to measure the execution time of those simulations.
 `
 )
 

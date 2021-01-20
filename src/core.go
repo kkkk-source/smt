@@ -52,11 +52,7 @@ func Run() {
 				if err != nil {
 					os.Exit(1)
 				}
-				if *WFlag != 0 {
-					FinancialLackSimulationWithoutInfo(alice, bob)
-				} else {
-					FinancialLackSimulation(alice, bob)
-				}
+                FinancialLackSimulation(alice, bob)
 			} else {
 				os.Exit(1)
 			}
@@ -67,7 +63,7 @@ func Run() {
 	if FFlagLen != 0 {
 		switch FFlag[0] {
 		case "1":
-			if SFlagLen == 3 {
+			if FFlagLen == 3 {
 				alice, err := strconv.Atoi(FFlag[1])
 				if err != nil {
 					os.Exit(1)
@@ -76,7 +72,7 @@ func Run() {
 				if err != nil {
 					os.Exit(1)
 				}
-				AvoidDataRace(alice, bob)
+                AvoidDataRace(alice, bob)
 			} else {
 				os.Exit(1)
 			}
