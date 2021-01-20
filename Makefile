@@ -1,5 +1,5 @@
 build:
-	go build -o bin/main main.go
+	go build -o bin/smt main.go
 	gcc -o bin/time time.c -Wall -Werror
 
 run:
