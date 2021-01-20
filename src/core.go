@@ -33,8 +33,10 @@ func Run() {
 		MakeServer(ClockServer, port, cway)
 	case 3:
 		DiskUsage([]string{"."})
+		os.Exit(0)
 	case 4:
 		SpinnerAnimation()
+		os.Exit(0)
 	}
 
 	SFlagLen := len(SFlag)
@@ -52,7 +54,8 @@ func Run() {
 				if err != nil {
 					os.Exit(1)
 				}
-                FinancialLackSimulation(alice, bob)
+				FinancialLackSimulation(alice, bob)
+				os.Exit(0)
 			} else {
 				os.Exit(1)
 			}
@@ -72,7 +75,8 @@ func Run() {
 				if err != nil {
 					os.Exit(1)
 				}
-                AvoidDataRace(alice, bob)
+				AvoidDataRace(alice, bob)
+				os.Exit(0)
 			} else {
 				os.Exit(1)
 			}
